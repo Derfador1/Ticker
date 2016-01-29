@@ -2,6 +2,7 @@
 	#define TICKER_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 struct company {
 	char symbol[6];
