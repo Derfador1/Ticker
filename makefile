@@ -1,11 +1,13 @@
 
 CFLAGS+=-std=c11
-CLFAGS+=-Wall -Wextra -Wpedantic
+CFLAGS+=-Wall -Wextra -Wpedantic
 CFLAGS+=-Wwrite-strings -Wstack-usage=1024 -Wfloat-equal -Waggregate-return -Winline
 
-CFLAGS+=-I../llist
+CFLAGS+=-D_BSD_SOURCE
 
-driver1: driver1.o ll_stack.o double_llist.o
+LDLIBS+=-lm
+
+ticker: ticker.o
 
 .PHONY: clean debug
 
@@ -13,3 +15,4 @@ clean:
 	-rm *.o
 
 debug: CFLAGS+=-g
+debug: ticker
