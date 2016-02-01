@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
 	char operator;
 	char symbol2[6];
 	double cents2;
-	while(1) {
+	while(!feof(stdin)) {
 		operator = '\0';
 		fscanf(stdin, "%s %c%lf", symbol2, &operator, &cents2);
-		//market_update(symbol, operator, cents);
+		//market_insert();
 	}
 
 	tree_inorder(m->root);
@@ -160,6 +160,9 @@ market *market_insert(market *m, struct company *comp)
 	if(!m->root) {
 		m->root = tree_create(comp);
 	}
+	else if(m->cmp(comp, m->root->data) == 0) {
+		m->root->data->cents += value given;
+	}
 	else {
 		tree_insert(m->root, comp, m->cmp);
 	}
@@ -189,10 +192,3 @@ void tree_inorder(struct tree *t) //change to market inorder
 	printf("%s %zd.%zd %s\n", t->data->symbol, t->data->cents / 100, t->data->cents % 100, t->data->name);
 	tree_inorder(t->right);
 }
-
-/*
-market_update(char *symbol, double cents, char *operator)
-{
-
-}
-*/
