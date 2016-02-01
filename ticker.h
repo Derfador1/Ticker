@@ -29,4 +29,7 @@ int compare_symbol(struct company *a, struct company *b);
 int cmp(const struct company *a, const struct company *b);
 struct tree *tree_create(struct company *data);
 void tree_destroy(struct tree *t);
+market *make_market(void);
+market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *, const struct company *)); 
+void market_destory(market *m);
 
