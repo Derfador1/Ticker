@@ -98,3 +98,28 @@ void tree_destroy(struct tree *t)
 
 	free(t);
 }
+
+market *market_create(void) 
+{
+	market *m = malloc(sizeof(*m));
+	if(m) {
+		m->root = NULL;
+	}
+
+	return m;
+}
+
+market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *, const struct company *))
+{
+	if(!m->root) {
+		m->root = tree_create(comp);
+	}
+	else {
+		tree_insert(m->root, comp, m->cmp);
+	}
+}
+
+void market_destory(market *m) 
+{
+
+}
