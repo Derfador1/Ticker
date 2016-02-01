@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "ticker_tree.h"
 
-/*
+
 struct company {
 	char symbol[6];
 	size_t cents;
@@ -16,7 +16,7 @@ struct tree {
 	struct company *data;
 	struct tree *left, *right;
 };
-*/
+
 
 typedef struct {
 	struct tree *root;
@@ -26,5 +26,7 @@ typedef struct {
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *, const struct company *));
 struct company *stock_create(char *symbol, char *name, double price);
 int compare_symbol(struct company *a, struct company *b);
-int cmp(const struct company *a, const struct company *b)
+int cmp(const struct company *a, const struct company *b);
+struct tree *tree_create(struct company *data);
+void tree_destroy(struct tree *t);
 
