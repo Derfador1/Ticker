@@ -52,3 +52,20 @@ struct company *stock_create(char *symbol, char *name, double price)
 
 	return new_stock;
 }
+
+
+int cmp(const struct company *a, const struct company *b)
+{
+	if(a->cents < b->cents) {
+		//less then
+		return -1;
+	}
+	else if(a->cents > b->cents) {
+		//greater then
+		return 1;
+	}
+	else {
+		//equal to
+		return 0;
+	}
+}
