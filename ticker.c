@@ -38,9 +38,19 @@ int main(int argc, char *argv[])
 		market_insert(m, comp);
 	}
 
+	char operator;
+	char symbol2[6];
+	double cents2;
+	while(1) {
+		operator = '\0';
+		fscanf(stdin, "%s %c%lf", symbol2, &operator, &cents2);
+		//market_update(symbol, operator, cents);
+	}
+
 	tree_inorder(m->root);
 
 	fclose(fp);
+	//market_destroy(m);
 	return 0;
 }
 
@@ -139,6 +149,7 @@ market *market_create(int (*cmp)(const struct company *a, const struct company *
 	market *m = malloc(sizeof(*m));
 	if(m) {
 		m->root = NULL;
+		m->cmp = cmp;
 	}
 
 	return m;
@@ -150,18 +161,21 @@ market *market_insert(market *m, struct company *comp)
 		m->root = tree_create(comp);
 	}
 	else {
-		tree_insert(m->root, comp, compare_symbol);
+		tree_insert(m->root, comp, m->cmp);
 	}
 
 	return m;
 }
 
+/*
 void market_destory(market *m) 
 {
-
+	
 }
+*/
 
-void tree_inorder(struct tree *t)
+
+void tree_inorder(struct tree *t) //change to market inorder
 {
 	if(!t) {
 		return;
@@ -172,3 +186,9 @@ void tree_inorder(struct tree *t)
 	tree_inorder(t->right);
 }
 
+/*
+market_update(char *symbol, double cents, char *operator)
+{
+
+}
+*/
