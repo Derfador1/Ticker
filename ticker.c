@@ -23,12 +23,19 @@ int main(int argc, char *argv[])
 	double cents;
 	char name[65];
 
-	market *m = market_create();
+	market *m = market_create(compare_symbol);
 
-	while(feof(fp)) {
-		fscanf(fp, "%s, %lf, %[^\n]", symbol, &cents, name);
+	while(!feof(fp)) {
+		name[0] = '\0';
+		fscanf(fp, "%s %lf",  symbol, &cents);
+		if(fgetc(fp) == ' ') {
+			fscanf(fp, "%[^\n]", name);
+		}
+		else if(fgetc(fp) == EOF) {
+			break;
+		}
 		struct company *comp = stock_create(symbol, name, cents);
-		market_insert(m, comp, compare_symbol);
+		market_insert(m, comp);
 	}
 
 	tree_inorder(m->root);
@@ -38,7 +45,7 @@ int main(int argc, char *argv[])
 }
 
 int compare_symbol(const struct company *a, const struct company *b)
-{	
+{
 	int value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
 	return value; //return to let program know is compare was successful
 }
@@ -127,7 +134,7 @@ void tree_destroy(struct tree *t)
 	free(t);
 }
 
-market *market_create(void) 
+market *market_create(int (*cmp)(const struct company *a, const struct company *b))
 {
 	market *m = malloc(sizeof(*m));
 	if(m) {
@@ -137,13 +144,13 @@ market *market_create(void)
 	return m;
 }
 
-market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
+market *market_insert(market *m, struct company *comp)
 {
 	if(!m->root) {
 		m->root = tree_create(comp);
 	}
 	else {
-		tree_insert(m->root, comp, cmp);
+		tree_insert(m->root, comp, compare_symbol);
 	}
 
 	return m;
@@ -161,7 +168,7 @@ void tree_inorder(struct tree *t)
 	}
 
 	tree_inorder(t->left);
-	printf("%s %zd %s\n", t->data->symbol, t->data->cents, t->data->name);
+	printf("%s %zd.%zd %s\n", t->data->symbol, t->data->cents / 100, t->data->cents % 100, t->data->name);
 	tree_inorder(t->right);
 }
 
