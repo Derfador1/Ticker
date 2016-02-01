@@ -24,11 +24,14 @@ int main(int argc, char *argv[])
 	char name[65];
 
 	market *m = market_create(compare_symbol);
+	market *m = market_create(compare_scents);
 
 	while(!feof(fp)) {
 		name[0] = '\0';
-		fscanf(fp, "%s %lf",  symbol, &cents);
-		printf("%s\n", symbol);
+		if(2 != fscanf(fp, "%s %lf",  symbol, &cents)) {
+			break;
+		}
+
 		if(fgetc(fp) == ' ') {
 			fscanf(fp, "%[^\n]", name);
 		}
@@ -41,7 +44,6 @@ int main(int argc, char *argv[])
 
 	tree_inorder(m->root);
 
-	//char operator;
 	char symbol2[6];
 	char name2[65];
 
@@ -50,9 +52,12 @@ int main(int argc, char *argv[])
 	while(!feof(stdin)) {
 		double cents2 = 0;
 		fscanf(stdin, "%s %lf", symbol2, &cents2);
-		printf("%s\n", symbol2);
 		struct company *comp1 = stock_create(symbol2, name2, cents2);
 		market_insert(m, comp1);
+	}
+
+	while() {
+		market_insert(m2, m->root->data);	
 	}
 
 	tree_inorder(m->root);
@@ -60,7 +65,7 @@ int main(int argc, char *argv[])
 
 
 	fclose(fp);
-	//market_destroy(m);
+	market_destroy(m);
 	return 0;
 }
 
@@ -83,7 +88,6 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 		}
 	}
 	else if(cmp(comp, t->data) == 0) {
-		printf("tree add\n");
 		return t->data->cents += comp->cents;
 		
 	}
@@ -120,7 +124,7 @@ struct company *stock_create(char *symbol, char *name, double price)
 }
 
 
-int cmp(const struct company *a, const struct company *b)
+int compare_cents(const struct company *a, const struct company *b)
 {
 	if(a->cents < b->cents) {
 		//less then
@@ -174,11 +178,9 @@ market *market_create(int (*cmp)(const struct company *a, const struct company *
 market *market_insert(market *m, struct company *comp)
 {
 	if(!m->root) {
-		printf("tree create\n");
 		m->root = tree_create(comp);
 	}
 	else {
-		printf("tree insert\n");
 		tree_insert(m->root, comp, m->cmp);
 	}
 
@@ -206,4 +208,19 @@ void tree_inorder(struct tree *t) //change to market inorder
 	tree_inorder(t->left);
 	printf("%s %zd.%zd %s\n", t->data->symbol, t->data->cents / 100, t->data->cents % 100, t->data->name);
 	tree_inorder(t->right);
+}
+
+void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b)
+{
+	if(!src) {
+		return;
+	}
+
+	if(!dst) {
+		dst = tree_create(src->data);
+	}
+
+	tree_insert(dst, src->data, cmp);
+	tree_left(dst, src->left, cmp);
+	tree_right(dst, src->right, cmp);	
 }
