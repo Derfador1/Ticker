@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
 	market *m = market_create(compare_symbol);
 
 	while(!feof(fp)) {
+		name[0] = '\0';
 		fscanf(fp, "%s %lf",  symbol, &cents);
 		printf("%s\n", symbol);
 		if(fgetc(fp) == ' ') {
@@ -40,17 +41,17 @@ int main(int argc, char *argv[])
 
 	tree_inorder(m->root);
 
-	char operator;
+	//char operator;
 	char symbol2[6];
-	double cents2;
 	char name2[65];
 
 	name2[0] = '\0';
 
 	while(!feof(stdin)) {
-		fscanf(stdin, "%s %c%lf", symbol2, &operator, &cents2);
-		printf("%s\n", symbol);
-		struct company *comp1 = stock_create(symbol2, name2, cents);
+		double cents2 = 0;
+		fscanf(stdin, "%s %lf", symbol2, &cents2);
+		printf("%s\n", symbol2);
+		struct company *comp1 = stock_create(symbol2, name2, cents2);
 		market_insert(m, comp1);
 	}
 
@@ -71,7 +72,8 @@ int compare_symbol(const struct company *a, const struct company *b)
 
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
-	if(cmp(comp, t->data) < 1) {
+
+	if(cmp(comp, t->data) < 0) {
 		if(t->left) {
 			return tree_insert(t->left, comp, cmp);//need to call cmp function
 		}
@@ -79,6 +81,11 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 			t->left = tree_create(comp);
 			return t->left;
 		}
+	}
+	else if(cmp(comp, t->data) == 0) {
+		printf("tree add\n");
+		return t->data->cents += comp->cents;
+		
 	}
 	else {
 		if(t->right) {
@@ -169,10 +176,6 @@ market *market_insert(market *m, struct company *comp)
 	if(!m->root) {
 		printf("tree create\n");
 		m->root = tree_create(comp);
-	}
-	else if(m->cmp(comp, m->root->data) == 0) {
-		printf("tree add\n");
-		m->root->data->cents += comp->cents;
 	}
 	else {
 		printf("tree insert\n");
