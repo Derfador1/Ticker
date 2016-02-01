@@ -44,6 +44,9 @@ int main(int argc, char *argv[])
 	char symbol2[6];
 	double cents2;
 	char name2[65];
+
+	name2[0] = '\0';
+
 	while(!feof(stdin)) {
 		fscanf(stdin, "%s %c%lf", symbol2, &operator, &cents2);
 		printf("%s\n", symbol);
