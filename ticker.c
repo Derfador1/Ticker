@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
 	market *m = market_create(compare_symbol);
 	market *dst_m = market_create(compare_cents);
 
+	struct company *comp1;
+	struct company *comp;
+
 	while(!feof(fp)) {
 		name[0] = '\0';
 		if(2 != fscanf(fp, "%s %lf",  symbol, &cents)) {
@@ -38,7 +41,7 @@ int main(int argc, char *argv[])
 		else if(fgetc(fp) == EOF) {
 			break;
 		}
-		struct company *comp = stock_create(symbol, name, cents);
+		comp = stock_create(symbol, name, cents);
 		market_insert(m, comp);
 	}
 
@@ -52,18 +55,27 @@ int main(int argc, char *argv[])
 	while(!feof(stdin)) {
 		double cents2 = 0;
 		fscanf(stdin, "%s %lf", symbol2, &cents2);
-		struct company *comp1 = stock_create(symbol2, name2, cents2);
+		comp1 = stock_create(symbol2, name2, cents2);
 		market_insert(m, comp1);
 	}
 
-	market_copy(dst_m, m);
+	market_copy(dst_m, m->root);
 
 	tree_inorder(dst_m->root);
 
-
-
 	fclose(fp);
-	//market_destroy(m);
+	/*
+	market_destroy(dst_m);
+	market_destroy(m);
+	free(comp1->name);
+	free(comp1);
+	free(comp->name);
+	free(comp);
+	*/
+	tree_destroy(m->root);
+	tree_destroy(dst_m->root);
+	free(dst_m);
+	free(m);
 	return 0;
 }
 
@@ -156,9 +168,9 @@ void tree_destroy(struct tree *t)
 		return;
 	}
 
+	
 	tree_destroy(t->left);
 	tree_destroy(t->right);
-
 	free(t);
 }
 
@@ -197,7 +209,6 @@ void market_destroy(market *m)
 	free(m);
 }
 
-
 void tree_inorder(struct tree *t) //change to market inorder
 {
 	if(!t) {
@@ -209,9 +220,9 @@ void tree_inorder(struct tree *t) //change to market inorder
 	tree_inorder(t->right);
 }
 
-void market_copy(market *dst_m, market *src_m)
+void market_copy(market *dst_m, struct tree *t)
 {
-	if(!src_m) {
+	if(!t) {
 		return;
 	}
 
@@ -220,14 +231,7 @@ void market_copy(market *dst_m, market *src_m)
 	}
 
 
-	tree_insert(dst_m->root, src_m->root->data, dst_m->cmp); //to create first node of market
-	tree_copy(dst_m->root->left, src_m->root->left, dst_m->cmp); //on dst market->root->left
-	tree_copy(dst_m->root->right, src_m->root->right, dst_m->cmp); //on dst market->root->right
-}
-
-void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b))
-{
-	tree_insert(dst, src->data, cmp);
-	tree_copy(dst, src->left, cmp);
-	tree_copy(dst, src->right, cmp);	
+	market_insert(dst_m, t->data); //to create first node of market
+	market_copy(dst_m, t->left); //on dst market->root->left
+	market_copy(dst_m, t->right); //on dst market->root->right
 }
