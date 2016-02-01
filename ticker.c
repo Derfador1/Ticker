@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	char name[65];
 
 	market *m = market_create(compare_symbol);
-	market *m = market_create(compare_scents);
+	market *dst_m = market_create(compare_cents);
 
 	while(!feof(fp)) {
 		name[0] = '\0';
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	}
 
 	while() {
-		market_insert(m2, m->root->data);	
+		market_copy(dst_m, m, dst_m->cmp);
 	}
 
 	tree_inorder(m->root);
@@ -210,17 +210,25 @@ void tree_inorder(struct tree *t) //change to market inorder
 	tree_inorder(t->right);
 }
 
-void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b)
+void market_copy(market *dst_m, market *src_m)
 {
-	if(!src) {
+	if(!src_m) {
 		return;
 	}
 
-	if(!dst) {
-		dst = tree_create(src->data);
+	if(!dst_m) {
+		dst_m = market_create(compare_cents);
 	}
 
-	tree_insert(dst, src->data, cmp);
+
+	tree_insert(dst_m->root, src_m->root->data, dst_m->cmp); //to create first node of market
+	tree_copy(dst_m->root->left, src_m->root->left, dst_m->cmp); //on dst market->root->left
+	tree_copy(dst_m->root->right, src_m->root->right, dst_m->cmp); //on dst market->root->right
+}
+
+void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b)
+{
+
 	tree_left(dst, src->left, cmp);
 	tree_right(dst, src->right, cmp);	
 }
