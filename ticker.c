@@ -1,13 +1,13 @@
 
-#include "ticker.h"
-
 #include <string.h>
+
+#include "ticker.h"
 
 int main(int argc, char *argv[])
 {
 	FILE *fp;
 
-	if(agrc != 2) {
+	if(argc != 2) {
 		printf("Error\n");
 		return 0;
 	}
@@ -27,23 +27,27 @@ int main(int argc, char *argv[])
 
 	while(feof(fp)) {
 		fscanf(fp, "%s, %lf, %[^\n]", symbol, &cents, name);
-		struct company *comp = stock_create(&symbol, &cents, name);
-		market_insert(m, comp, compare_cents);
+		struct company *comp = stock_create(symbol, name, cents);
+		market_insert(m, comp, compare_symbol);
 	}
+
+	tree_inorder(m->root);
+
+	fclose(fp);
+	return 0;
 }
 
-int compare_symbol(struct company *a, struct company *b)
-{
-	int value;
-	value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
+int compare_symbol(const struct company *a, const struct company *b)
+{	
+	int value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
 	return value; //return to let program know is compare was successful
 }
 
-bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *, const struct company *))
+bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
 	if(cmp(comp, t->data) < 1) {
 		if(t->left) {
-			return tree_insert(t->left, comp);//need to call cmp function
+			return tree_insert(t->left, comp, cmp);//need to call cmp function
 		}
 		else {
 			t->left = tree_create(comp);
@@ -52,7 +56,7 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 	}
 	else {
 		if(t->right) {
-			return tree_insert(t->right, comp);
+			return tree_insert(t->right, comp, cmp);
 		}
 		else {
 			t->right = tree_create(comp);
@@ -133,17 +137,31 @@ market *market_create(void)
 	return m;
 }
 
-market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *, const struct company *))
+market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
 	if(!m->root) {
 		m->root = tree_create(comp);
 	}
 	else {
-		tree_insert(m->root, comp, m->cmp);
+		tree_insert(m->root, comp, cmp);
 	}
+
+	return m;
 }
 
 void market_destory(market *m) 
 {
 
 }
+
+void tree_inorder(struct tree *t)
+{
+	if(!t) {
+		return;
+	}
+
+	tree_inorder(t->left);
+	printf("%s %zd %s\n", t->data->symbol, t->data->cents, t->data->name);
+	tree_inorder(t->right);
+}
+
