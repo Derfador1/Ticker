@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
 int compare_symbol(struct company *a, struct company *b)
 {
-	int value = 0;
+	int value;
 	value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
 	return value; //return to let program know is compare was successful
 }
@@ -73,4 +73,28 @@ int cmp(const struct company *a, const struct company *b)
 		//equal to
 		return 0;
 	}
+}
+
+struct tree *tree_create(struct company *data)
+{
+	struct tree *t = malloc(sizeof(*t));
+	if(t) {
+		t->data = data;
+		t->left = NULL;
+		t->right = NULL;
+	}
+
+	return t;
+}
+
+void tree_destroy(struct tree *t)
+{
+	if(!t) {
+		return;
+	}
+
+	tree_destroy(t->left);
+	tree_destroy(t->right);
+
+	free(t);
 }
