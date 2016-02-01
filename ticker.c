@@ -5,7 +5,31 @@
 
 int main(int argc, char *argv[])
 {
- //add code to test tree insert and stock create 
+	FILE *fp;
+
+	if(agrc != 2) {
+		printf("Error\n");
+		return 0;
+	}
+	else {
+		fp = fopen(argv[1], "r");
+		if(!fp) {
+			printf("suck it\n");
+			return 0;
+		}
+	}
+
+	char symbol[6];
+	double cents;
+	char name[65];
+
+	market *m = market_create();
+
+	while(feof(fp)) {
+		fscanf(fp, "%s, %lf, %[^\n]", symbol, &cents, name);
+		struct company *comp = stock_create(&symbol, &cents, name);
+		market_insert(m, comp, compare_cents);
+	}
 }
 
 int compare_symbol(struct company *a, struct company *b)
