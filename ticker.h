@@ -30,8 +30,8 @@ int compare_symbol(const struct company *a, const struct company *b);
 int cmp(const struct company *a, const struct company *b);
 struct tree *tree_create(struct company *data);
 void tree_destroy(struct tree *t);
-market *market_create(void);
-market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *a, const struct company *b)); 
+market *market_create(int (*cmp)(const struct company *a, const struct company *b));
+market *market_insert(market *m, struct company *comp); 
 void market_destory(market *m);
 void tree_inorder(struct tree *t);
 
