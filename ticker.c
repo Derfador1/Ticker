@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
 	market *m = market_create(compare_symbol);
 
 	while(!feof(fp)) {
-		name[0] = '\0';
 		fscanf(fp, "%s %lf",  symbol, &cents);
+		printf("%s\n", symbol);
 		if(fgetc(fp) == ' ') {
 			fscanf(fp, "%[^\n]", name);
 		}
@@ -38,19 +38,21 @@ int main(int argc, char *argv[])
 		market_insert(m, comp);
 	}
 
-	char operator;
+	/*
 	char symbol2[6];
 	double cents2;
+	char name2[65];
 	while(!feof(stdin)) {
-		operator = '\0';
-		fscanf(stdin, "%s %c%lf", symbol2, &operator, &cents2);
-		//market_insert();
+		fscanf(stdin, "%s %lf", symbol2, &cents2);
+		struct company *comp1 = stock_create(symbol2, name2, cents);
+		market_insert(m, comp1);
 	}
+	*/
 
 	tree_inorder(m->root);
 
 	fclose(fp);
-	market_destroy(m);
+	//market_destroy(m);
 	return 0;
 }
 
@@ -158,12 +160,15 @@ market *market_create(int (*cmp)(const struct company *a, const struct company *
 market *market_insert(market *m, struct company *comp)
 {
 	if(!m->root) {
+		printf("tree create\n");
 		m->root = tree_create(comp);
 	}
 	else if(m->cmp(comp, m->root->data) == 0) {
-		m->root->data->cents += value given;
+		printf("tree add\n");
+		m->root->data->cents += comp->cents;
 	}
 	else {
+		printf("tree insert\n");
 		tree_insert(m->root, comp, m->cmp);
 	}
 
