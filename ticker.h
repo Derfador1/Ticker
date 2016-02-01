@@ -9,7 +9,7 @@
 
 struct company {
 	char symbol[6];
-	size_t cents;
+	ssize_t cents;
 	char *name;
 };
 
