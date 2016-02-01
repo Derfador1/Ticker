@@ -32,8 +32,9 @@ struct tree *tree_create(struct company *data);
 void tree_destroy(struct tree *t);
 market *market_create(int (*cmp)(const struct company *a, const struct company *b));
 market *market_insert(market *m, struct company *comp); 
-void market_destory(market *m);
+void market_destroy(market *m);
 void tree_inorder(struct tree *t);
-void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b)
+void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b));
+void market_copy(market *dst_m, market *src_m);
 
 #endif
