@@ -3,6 +3,11 @@
 
 #include <string.h>
 
+int main(int argc, char *argv[])
+{
+ //add code to test tree insert and stock create 
+}
+
 int compare_symbol(struct company *a, struct company *b)
 {
 	int value = 0;
