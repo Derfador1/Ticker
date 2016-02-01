@@ -3,7 +3,9 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include "ticker_tree.h"
 
+/*
 struct company {
 	char symbol[6];
 	size_t cents;
@@ -14,6 +16,7 @@ struct tree {
 	struct company *data;
 	struct tree *left, *right;
 };
+*/
 
 typedef struct {
 	struct tree *root;
