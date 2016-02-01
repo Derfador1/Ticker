@@ -56,16 +56,14 @@ int main(int argc, char *argv[])
 		market_insert(m, comp1);
 	}
 
-	while() {
-		market_copy(dst_m, m, dst_m->cmp);
-	}
+	market_copy(dst_m, m);
 
-	tree_inorder(m->root);
+	tree_inorder(dst_m->root);
 
 
 
 	fclose(fp);
-	market_destroy(m);
+	//market_destroy(m);
 	return 0;
 }
 
@@ -188,11 +186,12 @@ market *market_insert(market *m, struct company *comp)
 }
 
 
-void market_destory(market *m) 
+void market_destroy(market *m) 
 {
 	if(!m) {
 		return;
 	}	
+
 
 	tree_destroy(m->root);
 	free(m);
@@ -226,9 +225,9 @@ void market_copy(market *dst_m, market *src_m)
 	tree_copy(dst_m->root->right, src_m->root->right, dst_m->cmp); //on dst market->root->right
 }
 
-void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b)
+void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b))
 {
-
-	tree_left(dst, src->left, cmp);
-	tree_right(dst, src->right, cmp);	
+	tree_insert(dst, src->data, cmp);
+	tree_copy(dst, src->left, cmp);
+	tree_copy(dst, src->right, cmp);	
 }
