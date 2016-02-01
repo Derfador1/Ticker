@@ -2,8 +2,9 @@
 	#define TICKER_H
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include "ticker_tree.h"
+#include <math.h>
 
 
 struct company {
@@ -23,13 +24,15 @@ typedef struct {
 	int (*cmp)(const struct company *, const struct company *);
 } market;
 
-bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *, const struct company *));
+bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b));
 struct company *stock_create(char *symbol, char *name, double price);
-int compare_symbol(struct company *a, struct company *b);
+int compare_symbol(const struct company *a, const struct company *b);
 int cmp(const struct company *a, const struct company *b);
 struct tree *tree_create(struct company *data);
 void tree_destroy(struct tree *t);
-market *make_market(void);
-market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *, const struct company *)); 
+market *market_create(void);
+market *market_insert(market *m, struct company *comp, int (*cmp)(const struct company *a, const struct company *b)); 
 void market_destory(market *m);
+void tree_inorder(struct tree *t);
 
+#endif
