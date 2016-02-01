@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-int compare_name(struct company *a, struct company *b)
+int compare_symbol(struct company *a, struct company *b)
 {
 	int value = 0;
 	value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
