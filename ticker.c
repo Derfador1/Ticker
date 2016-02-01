@@ -38,18 +38,22 @@ int main(int argc, char *argv[])
 		market_insert(m, comp);
 	}
 
-	/*
+	tree_inorder(m->root);
+
+	char operator;
 	char symbol2[6];
 	double cents2;
 	char name2[65];
 	while(!feof(stdin)) {
-		fscanf(stdin, "%s %lf", symbol2, &cents2);
+		fscanf(stdin, "%s %c%lf", symbol2, &operator, &cents2);
+		printf("%s\n", symbol);
 		struct company *comp1 = stock_create(symbol2, name2, cents);
 		market_insert(m, comp1);
 	}
-	*/
 
 	tree_inorder(m->root);
+
+
 
 	fclose(fp);
 	//market_destroy(m);
