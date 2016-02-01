@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 	tree_inorder(m->root);
 
 	fclose(fp);
-	//market_destroy(m);
+	market_destroy(m);
 	return 0;
 }
 
@@ -167,12 +167,16 @@ market *market_insert(market *m, struct company *comp)
 	return m;
 }
 
-/*
+
 void market_destory(market *m) 
 {
-	
+	if(!m) {
+		return;
+	}	
+
+	tree_destroy(m->root);
+	free(m);
 }
-*/
 
 
 void tree_inorder(struct tree *t) //change to market inorder
