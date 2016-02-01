@@ -3,11 +3,18 @@
 
 #include <string.h>
 
+int compare_name(struct company *a, struct company *b)
+{
+	int value = 0;
+	value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
+	return value; //return to let program know is compare was successful
+}
+
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *, const struct company *))
 {
 	if(cmp(comp, t->data) < 1) {
 		if(t->left) {
-			return tree_insert(t->left, comp);
+			return tree_insert(t->left, comp);//need to call cmp function
 		}
 		else {
 			t->left = tree_create(comp);
