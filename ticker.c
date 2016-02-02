@@ -64,18 +64,10 @@ int main(int argc, char *argv[])
 	tree_inorder(dst_m->root);
 
 	fclose(fp);
-	/*
+
 	market_destroy(dst_m);
-	market_destroy(m);
-	free(comp1->name);
-	free(comp1);
-	free(comp->name);
-	free(comp);
-	*/
-	tree_destroy(m->root);
-	tree_destroy(dst_m->root);
-	free(dst_m);
-	free(m);
+	market_disassembler(m);
+	
 	return 0;
 }
 
@@ -171,6 +163,21 @@ void tree_destroy(struct tree *t)
 	
 	tree_destroy(t->left);
 	tree_destroy(t->right);
+	free(t->data->name);
+	free(t->data);
+	free(t);
+}
+
+void tree_disassembler(struct tree *t)
+{
+	if(!t) {
+		return;
+	} 
+
+	tree_disassembler(t->left);
+	t->left = NULL;
+	tree_disassembler(t->right);
+	t->right = NULL;
 	free(t);
 }
 
@@ -206,6 +213,16 @@ void market_destroy(market *m)
 
 
 	tree_destroy(m->root);
+	free(m);
+}
+
+void market_disassembler(market *m)
+{
+	if(!m) {
+		return;
+	}
+
+	tree_disassembler(m->root);
 	free(m);
 }
 
