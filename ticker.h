@@ -39,6 +39,7 @@ void market_copy(market *dst_m, struct tree *t);
 void destroy_everything(market *m);
 void tree_disassembler(struct tree *t);
 void market_disassembler(market *m);
-void stock_disassembler(struct company *c);
+void stock_destroyer(struct company *c);
+void market_inorder(market *m);
 
 #endif
