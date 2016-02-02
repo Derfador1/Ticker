@@ -38,10 +38,11 @@ int main(int argc, char *argv[])
 
 	while(!feof(fp)) {
 		name[0] = '\0';
-		if(2 != fscanf(fp, "%5s %lf",  symbol, &cents)) { //if the fscanf doesnt return 2 things matched we will break
-			fprintf(stderr, "One of your stocks did not fit the correct format\n");
-			break;
+		int d = fscanf(fp, "%5s %lf",  symbol, &cents);//if the fscanf doesnt return 2 things matched we will break
+		if (2 != fscanf(fp, "%5s %lf",  symbol, &cents)) {
+			printf("your mom\n");
 		}
+		printf("%d\n", d);
 
 		if(fgetc(fp) == ' ') {
 			fscanf(fp, "%[^\n]", name); //if there is still a space after our fscanf we pull in the string as name
