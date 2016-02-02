@@ -75,11 +75,14 @@ int main(int argc, char *argv[])
 				}
 				continue;
 			}
+
 		}
 
 		comp1 = stock_create(symbol2, name2, cents2);
 
 		market_upsert(m, comp1);
+
+		stock_destroyer(comp1);
 	}
 
 	market_copy(dst_m, m->root); //copies the tree to the dst market
