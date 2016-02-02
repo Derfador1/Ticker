@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
 
 	while(!feof(stdin)) {
 		double cents2 = 0;
-		/*
 		if(2 != fscanf(stdin, "%s %lf", symbol2, &cents2)) {
 			continue;
 		}
@@ -66,7 +65,6 @@ int main(int argc, char *argv[])
 		else {
 			comp1 = stock_create(symbol2, name2, cents2);
 		}
-		*/
 
 		market_insert(m, comp1);
 	}
