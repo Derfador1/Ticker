@@ -111,7 +111,7 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 		}
 	}
 	else if(cmp(comp, t->data) == 0) {
-		if(temp >= 0) { //if the temp is >= .01 then add the new comp cents and return false
+		if(temp >= .01) { //if the temp is >= .01 then add the new comp cents and return false
 			t->data->cents += comp->cents;
 			return true;
 		}
