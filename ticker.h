@@ -37,5 +37,7 @@ void tree_inorder(struct tree *t);
 void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b));
 void market_copy(market *dst_m, struct tree *t);
 void destroy_everything(market *m);
+void tree_disassembler(struct tree *t);
+void market_disassembler(market *m);
 
 #endif
