@@ -54,8 +54,20 @@ int main(int argc, char *argv[])
 
 	while(!feof(stdin)) {
 		double cents2 = 0;
-		fscanf(stdin, "%s %lf", symbol2, &cents2);
-		comp1 = stock_create(symbol2, name2, cents2);
+		/*
+		if(2 != fscanf(stdin, "%s %lf", symbol2, &cents2)) {
+			continue;
+		}
+
+		if(strlen(symbol2) > 6) {
+			printf("You should die sir\n");
+			break;
+		}
+		else {
+			comp1 = stock_create(symbol2, name2, cents2);
+		}
+		*/
+
 		market_insert(m, comp1);
 	}
 
@@ -65,7 +77,6 @@ int main(int argc, char *argv[])
 
 	fclose(fp);
 
-	stock_disassembler(comp);
 	market_destroy(m);
 	market_disassembler(dst_m);
 	
@@ -80,7 +91,7 @@ int compare_symbol(const struct company *a, const struct company *b)
 
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
-
+	ssize_t temp = t->data->cents + comp->cents;
 	if(cmp(comp, t->data) < 0) {
 		if(t->left) {
 			return tree_insert(t->left, comp, cmp);//need to call cmp function
@@ -91,11 +102,15 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 		}
 	}
 	else if(cmp(comp, t->data) == 0) {
-		if (t->data->cents += comp->cents) {
+		if(temp > .01) {
+			t->data->cents += comp->cents;
 			return false;
 		}
-		else {
-			return t->data->cents;
+		else
+		{
+			printf("Not valid input\n");
+			stock_destroyer(comp);
+			return true;
 		}
 		
 	}
@@ -169,8 +184,7 @@ void tree_destroy(struct tree *t)
 	
 	tree_destroy(t->left);
 	tree_destroy(t->right);
-	//free(t->data->name);
-	//free(t->data);
+	stock_destroyer(t->data);
 	free(t);
 }
 
@@ -206,14 +220,14 @@ market *market_insert(market *m, struct company *comp)
 	else {
 		if(!tree_insert(m->root, comp, m->cmp))
 		{
-			stock_disassembler(comp);
+			stock_destroyer(comp);
 		}
 	}
 
 	return m;
 }
 
-void stock_disassembler(struct company *c)
+void stock_destroyer(struct company *c)
 {
 	if (!c) {
 		return;
