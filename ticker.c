@@ -6,14 +6,14 @@
 int main(int argc, char *argv[])
 {
 	FILE *fp;
-
+	//check validity of command line
 	if(argc != 2) {
 		printf("Error\n");
 		return 0;
 	}
 	else {
 		fp = fopen(argv[1], "r");
-		if(!fp) {
+		if(!fp) { //if the file we are trying to open doesnt exist
 			printf("suck it\n");
 			return 0;
 		}
@@ -23,40 +23,39 @@ int main(int argc, char *argv[])
 	double cents;
 	char name[65];
 
-	market *m = market_create(compare_symbol);
+	//makes my market m and dst_m
+	market *m = market_create(compare_symbol); 
 	market *dst_m = market_create(compare_cents);
 
 	struct company *comp1;
 	struct company *comp;
 
-	while(!feof(fp)) {
-		name[0] = '\0';
-		if(2 != fscanf(fp, "%s %lf",  symbol, &cents)) {
-			break;
-		}
-
-		if(fgetc(fp) == ' ') {
-			fscanf(fp, "%[^\n]", name);
-		}
-		else if(fgetc(fp) == EOF) {
-			break;
-		}
-		comp = stock_create(symbol, name, cents);
-		market_insert(m, comp);
-	}
-
-	tree_inorder(m->root);
-
 	char symbol2[6];
 	char name2[65];
 	int ch;
 
-	name2[0] = '\0';
+	name2[0] = '\0'; //makes sure name 2 is just a null byte
+
+	while(!feof(fp)) {
+		name[0] = '\0';
+		if(2 != fscanf(fp, "%s %lf",  symbol, &cents)) { //if the fscanf doesnt return 2 things matched we will break
+			break;
+		}
+
+		if(fgetc(fp) == ' ') {
+			fscanf(fp, "%[^\n]", name); //if there is still a space after our fscanf we pull in the string as name
+		}
+		else if(fgetc(fp) == EOF) { //otherwise we take in the rest of the fp
+			break;
+		}
+		comp = stock_create(symbol, name, cents); 
+		market_upsert(m, comp); //call market upsert with inserts and updates
+	}
 
 	while(!feof(stdin)) {
 		double cents2 = 0;
-		if(2 != fscanf(stdin, "%5s %lf", symbol2, &cents2)) {
-			if(feof(stdin)) {
+		if(2 != fscanf(stdin, "%5s %lf", symbol2, &cents2)) { //makes sure whats input into fscanf s is 5 characters long
+			if(feof(stdin)) { //if we have no input we break
 				printf("^D\n");
 				break;
 			}
@@ -71,12 +70,12 @@ int main(int argc, char *argv[])
 
 		comp1 = stock_create(symbol2, name2, cents2);
 
-		market_insert(m, comp1);
+		market_upsert(m, comp1);
 	}
 
-	market_copy(dst_m, m->root);
+	market_copy(dst_m, m->root); //copies the tree to the dst market
 
-	tree_inorder(dst_m->root);
+	market_inorder(dst_m); //printf the tree
 
 	fclose(fp);
 
@@ -88,10 +87,11 @@ int main(int argc, char *argv[])
 
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
-	ssize_t temp = t->data->cents + comp->cents;
+	ssize_t temp = t->data->cents + comp->cents; //used to check against .01 value
+	//liams code
 	if(cmp(comp, t->data) < 0) {
 		if(t->left) {
-			return tree_insert(t->left, comp, cmp);//need to call cmp function
+			return tree_insert(t->left, comp, cmp);
 		}
 		else {
 			t->left = tree_create(comp);
@@ -99,13 +99,13 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 		}
 	}
 	else if(cmp(comp, t->data) == 0) {
-		if(temp > .01) {
+		if(temp >= .01) { //if the temp is >= .01 then add the new comp cents and return false
 			t->data->cents += comp->cents;
 			return false;
 		}
 		else
 		{
-			fprintf(stderr, "Not valid input\n");
+			fprintf(stderr, "Not valid input\n"); //otherwise destroy the stock
 			stock_destroyer(comp);
 			return true;
 		}
@@ -124,6 +124,7 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 
 struct company *stock_create(char *symbol, char *name, double price)
 {
+	//liams code that creates new company
 	struct company *new_stock = malloc(sizeof(*new_stock));
 	if(!new_stock) {
 		return NULL;
@@ -165,6 +166,7 @@ int compare_cents(const struct company *a, const struct company *b)
 	}
 }
 
+//creates a tree node from the company with left and right set to null
 struct tree *tree_create(struct company *data)
 {
 	struct tree *t = malloc(sizeof(*t));
@@ -177,6 +179,7 @@ struct tree *tree_create(struct company *data)
 	return t;
 }
 
+//creates a market with a null root and a compare function
 market *market_create(int (*cmp)(const struct company *a, const struct company *b))
 {
 	market *m = malloc(sizeof(*m));
@@ -188,7 +191,8 @@ market *market_create(int (*cmp)(const struct company *a, const struct company *
 	return m;
 }
 
-market *market_insert(market *m, struct company *comp)
+//updates and inserts market
+market *market_upsert(market *m, struct company *comp)
 {
 	if(!m->root) {
 		m->root = tree_create(comp);
@@ -196,13 +200,14 @@ market *market_insert(market *m, struct company *comp)
 	else {
 		if(!tree_insert(m->root, comp, m->cmp))
 		{
-			stock_destroyer(comp);
+			stock_destroyer(comp); //if we got false back the we destroy the comp
 		}
 	}
 
 	return m;
 }
 
+//copies to dst_m from the tree
 void market_copy(market *dst_m, struct tree *t)
 {
 	if(!t) {
@@ -214,11 +219,12 @@ void market_copy(market *dst_m, struct tree *t)
 	}
 
 
-	market_insert(dst_m, t->data); //to create first node of market
-	market_copy(dst_m, t->left); //on dst market->root->left
-	market_copy(dst_m, t->right); //on dst market->root->right
+	market_upsert(dst_m, t->data);
+	market_copy(dst_m, t->left); 
+	market_copy(dst_m, t->right); 
 }
 
+//calls tree inorder and prints the market out
 void market_inorder(market *m)
 {
 	if(!m) {
@@ -228,6 +234,7 @@ void market_inorder(market *m)
 	tree_inorder(m->root);
 }
 
+//prints out the tree data in order
 void tree_inorder(struct tree *t) //change to market inorder
 {
 	if(!t) {
@@ -239,6 +246,7 @@ void tree_inorder(struct tree *t) //change to market inorder
 	tree_inorder(t->right);
 }
 
+//calls tree destroy and free the market so we can free everything
 void market_destroy(market *m) 
 {
 	if(!m) {
@@ -250,6 +258,7 @@ void market_destroy(market *m)
 	free(m);
 }
 
+//calls tree disassemble and frees the market to free the structure
 void market_disassembler(market *m)
 {
 	if(!m) {
@@ -260,6 +269,7 @@ void market_disassembler(market *m)
 	free(m);
 }
 
+//destroy the tree by recursively calling itself
 void tree_destroy(struct tree *t)
 {
 	if(!t) {
@@ -267,31 +277,33 @@ void tree_destroy(struct tree *t)
 	}
 
 	
-	tree_destroy(t->left);
-	tree_destroy(t->right);
+	tree_destroy(t->left); //recursion
+	tree_destroy(t->right); //recursion
 	stock_destroyer(t->data);
 	free(t);
 }
 
+//disassembles the tree and sets the nodes to null
 void tree_disassembler(struct tree *t)
 {
 	if(!t) {
 		return;
 	} 
 
-	tree_disassembler(t->left);
+	tree_disassembler(t->left); //recursion
 	t->left = NULL;
-	tree_disassembler(t->right);
+	tree_disassembler(t->right); //recursion
 	t->right = NULL;
 	free(t);
 }
 
+//used to destroy the stock/company that was created
 void stock_destroyer(struct company *c)
 {
 	if (!c) {
 		return;
 	}
 
-	free(c->name);
-	free(c);
+	free(c->name); //free the companys data
+	free(c); //free the company
 }
