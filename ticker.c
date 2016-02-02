@@ -86,12 +86,6 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-int compare_symbol(const struct company *a, const struct company *b)
-{
-	int value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
-	return value; //return to let program know is compare was successful
-}
-
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
 	ssize_t temp = t->data->cents + comp->cents;
@@ -149,6 +143,11 @@ struct company *stock_create(char *symbol, char *name, double price)
 	return new_stock;
 }
 
+int compare_symbol(const struct company *a, const struct company *b)
+{
+	int value = strcmp(a->symbol, b->symbol); //the return value will be stored in value
+	return value; //return to let program know is compare was successful
+}
 
 int compare_cents(const struct company *a, const struct company *b)
 {
@@ -178,32 +177,6 @@ struct tree *tree_create(struct company *data)
 	return t;
 }
 
-void tree_destroy(struct tree *t)
-{
-	if(!t) {
-		return;
-	}
-
-	
-	tree_destroy(t->left);
-	tree_destroy(t->right);
-	stock_destroyer(t->data);
-	free(t);
-}
-
-void tree_disassembler(struct tree *t)
-{
-	if(!t) {
-		return;
-	} 
-
-	tree_disassembler(t->left);
-	t->left = NULL;
-	tree_disassembler(t->right);
-	t->right = NULL;
-	free(t);
-}
-
 market *market_create(int (*cmp)(const struct company *a, const struct company *b))
 {
 	market *m = malloc(sizeof(*m));
@@ -230,16 +203,41 @@ market *market_insert(market *m, struct company *comp)
 	return m;
 }
 
-void stock_destroyer(struct company *c)
+void market_copy(market *dst_m, struct tree *t)
 {
-	if (!c) {
+	if(!t) {
 		return;
 	}
 
-	free(c->name);
-	free(c);
+	if(!dst_m) {
+		dst_m = market_create(compare_cents);
+	}
+
+
+	market_insert(dst_m, t->data); //to create first node of market
+	market_copy(dst_m, t->left); //on dst market->root->left
+	market_copy(dst_m, t->right); //on dst market->root->right
 }
 
+void market_inorder(market *m)
+{
+	if(!m) {
+		return;
+	}
+
+	tree_inorder(m->root);
+}
+
+void tree_inorder(struct tree *t) //change to market inorder
+{
+	if(!t) {
+		return;
+	}
+
+	tree_inorder(t->left);
+	printf("%s %zd.%zd %s\n", t->data->symbol, t->data->cents / 100, t->data->cents % 100, t->data->name);
+	tree_inorder(t->right);
+}
 
 void market_destroy(market *m) 
 {
@@ -262,29 +260,38 @@ void market_disassembler(market *m)
 	free(m);
 }
 
-void tree_inorder(struct tree *t) //change to market inorder
+void tree_destroy(struct tree *t)
 {
 	if(!t) {
 		return;
 	}
 
-	tree_inorder(t->left);
-	printf("%s %zd.%zd %s\n", t->data->symbol, t->data->cents / 100, t->data->cents % 100, t->data->name);
-	tree_inorder(t->right);
+	
+	tree_destroy(t->left);
+	tree_destroy(t->right);
+	stock_destroyer(t->data);
+	free(t);
 }
 
-void market_copy(market *dst_m, struct tree *t)
+void tree_disassembler(struct tree *t)
 {
 	if(!t) {
 		return;
+	} 
+
+	tree_disassembler(t->left);
+	t->left = NULL;
+	tree_disassembler(t->right);
+	t->right = NULL;
+	free(t);
+}
+
+void stock_destroyer(struct company *c)
+{
+	if (!c) {
+		return;
 	}
 
-	if(!dst_m) {
-		dst_m = market_create(compare_cents);
-	}
-
-
-	market_insert(dst_m, t->data); //to create first node of market
-	market_copy(dst_m, t->left); //on dst market->root->left
-	market_copy(dst_m, t->right); //on dst market->root->right
+	free(c->name);
+	free(c);
 }
