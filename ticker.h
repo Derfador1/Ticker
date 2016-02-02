@@ -31,7 +31,7 @@ int compare_cents(const struct company *a, const struct company *b);
 struct tree *tree_create(struct company *data);
 void tree_destroy(struct tree *t);
 market *market_create(int (*cmp)(const struct company *a, const struct company *b));
-market *market_insert(market *m, struct company *comp); 
+market *market_upsert(market *m, struct company *comp); 
 void market_destroy(market *m);
 void tree_inorder(struct tree *t);
 void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b));
