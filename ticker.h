@@ -29,17 +29,15 @@ struct company *stock_create(char *symbol, char *name, double price);
 int compare_symbol(const struct company *a, const struct company *b);
 int compare_cents(const struct company *a, const struct company *b);
 struct tree *tree_create(struct company *data);
-void tree_destroy(struct tree *t);
 market *market_create(int (*cmp)(const struct company *a, const struct company *b));
 market *market_upsert(market *m, struct company *comp); 
-void market_destroy(market *m);
-void tree_inorder(struct tree *t);
-void tree_copy(struct tree *dst, struct tree *src, int (*cmp)(const struct company *a, const struct company *b));
 void market_copy(market *dst_m, struct tree *t);
-void destroy_everything(market *m);
-void tree_disassembler(struct tree *t);
-void market_disassembler(market *m);
-void stock_destroyer(struct company *c);
 void market_inorder(market *m);
+void tree_inorder(struct tree *t);
+void market_destroy(market *m);
+void market_disassembler(market *m);
+void tree_destroy(struct tree *t);
+void tree_disassembler(struct tree *t);
+void stock_destroyer(struct company *c);
 
 #endif
