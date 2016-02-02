@@ -65,8 +65,9 @@ int main(int argc, char *argv[])
 
 	fclose(fp);
 
-	market_destroy(dst_m);
-	market_disassembler(m);
+	stock_disassembler(comp);
+	market_destroy(m);
+	market_disassembler(dst_m);
 	
 	return 0;
 }
@@ -90,7 +91,12 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 		}
 	}
 	else if(cmp(comp, t->data) == 0) {
-		return t->data->cents += comp->cents;
+		if (t->data->cents += comp->cents) {
+			return false;
+		}
+		else {
+			return t->data->cents;
+		}
 		
 	}
 	else {
@@ -163,8 +169,8 @@ void tree_destroy(struct tree *t)
 	
 	tree_destroy(t->left);
 	tree_destroy(t->right);
-	free(t->data->name);
-	free(t->data);
+	//free(t->data->name);
+	//free(t->data);
 	free(t);
 }
 
@@ -198,10 +204,23 @@ market *market_insert(market *m, struct company *comp)
 		m->root = tree_create(comp);
 	}
 	else {
-		tree_insert(m->root, comp, m->cmp);
+		if(!tree_insert(m->root, comp, m->cmp))
+		{
+			stock_disassembler(comp);
+		}
 	}
 
 	return m;
+}
+
+void stock_disassembler(struct company *c)
+{
+	if (!c) {
+		return;
+	}
+
+	free(c->name);
+	free(c);
 }
 
 
