@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
 
 	while(!feof(fp)) {
 		name[0] = '\0';
-		if(2 != fscanf(fp, "%s %lf",  symbol, &cents)) { //if the fscanf doesnt return 2 things matched we will break
+		if(2 != fscanf(fp, "%5s %lf",  symbol, &cents)) { //if the fscanf doesnt return 2 things matched we will break
+			fprintf(stderr, "One of your stocks did not fit the correct format\n");
 			break;
 		}
 
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct company *a, const struct company *b))
 {
 	ssize_t temp = t->data->cents + comp->cents; //used to check against .01 value
-	//liams code
+	//liams code for the tree insert file
 	if(cmp(comp, t->data) < 0) {
 		if(t->left) {
 			return tree_insert(t->left, comp, cmp);
