@@ -49,22 +49,27 @@ int main(int argc, char *argv[])
 
 	char symbol2[6];
 	char name2[65];
+	int ch;
 
 	name2[0] = '\0';
 
 	while(!feof(stdin)) {
 		double cents2 = 0;
-		if(2 != fscanf(stdin, "%s %lf", symbol2, &cents2)) {
-			continue;
+		if(2 != fscanf(stdin, "%5s %lf", symbol2, &cents2)) {
+			if(feof(stdin)) {
+				printf("^D\n");
+				break;
+			}
+			else {
+				printf("Error invalid input\n");
+				while((ch = getchar()) != '\n' && ch != EOF) {
+					//get rid of rest of standard input
+				}
+				continue;
+			}
 		}
 
-		if(strlen(symbol2) > 6) {
-			printf("You should die sir\n");
-			break;
-		}
-		else {
-			comp1 = stock_create(symbol2, name2, cents2);
-		}
+		comp1 = stock_create(symbol2, name2, cents2);
 
 		market_insert(m, comp1);
 	}
@@ -106,7 +111,7 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 		}
 		else
 		{
-			printf("Not valid input\n");
+			fprintf(stderr, "Not valid input\n");
 			stock_destroyer(comp);
 			return true;
 		}
