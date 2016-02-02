@@ -110,13 +110,12 @@ bool tree_insert(struct tree *t, struct company *comp, int (*cmp)(const struct c
 	else if(cmp(comp, t->data) == 0) {
 		if(temp >= .01) { //if the temp is >= .01 then add the new comp cents and return false
 			t->data->cents += comp->cents;
-			return false;
+			return true;
 		}
 		else
 		{
 			fprintf(stderr, "Not valid input\n"); //otherwise destroy the stock
-			stock_destroyer(comp);
-			return true;
+			return false;
 		}
 		
 	}
